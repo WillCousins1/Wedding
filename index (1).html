@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie & William — Wedding Album</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #b8860b; --gold-light: #d4a017;
+    --green-dark: #4a6741; --green-mid: #6b8f62; --green-light: #a8c5a0;
+    --cream: #faf9f5; --cream-dark: #f2ede3;
+    --text-dark: #2c2415; --text-mid: #5a4e38; --text-light: #8a7a60;
+    --border: #ddd5c0;
+  }
+  body { font-family: 'Cormorant Garamond', serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+  .leaf-corner { position: fixed; width: 200px; opacity: 0.8; pointer-events: none; z-index: 0; }
+  .page { position: relative; z-index: 1; min-height: 100vh; }
+
+  /* LOGIN */
+  #loginPage { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+  .login-card { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 3rem 2.5rem; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 2px 24px rgba(180,160,100,0.1); position: relative; }
+  .login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--green-mid), var(--gold), var(--green-mid)); border-radius: 4px 4px 0 0; }
+  .script-title { font-family: 'Great Vibes', cursive; font-size: 3rem; color: var(--gold); line-height: 1.1; margin-bottom: 0.2rem; }
+  .serif-sub { font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.5rem; }
+  .couple-names { font-size: 1.2rem; font-weight: 300; color: var(--text-dark); line-height: 1.5; }
+  .ampersand { font-family: 'Great Vibes', cursive; color: var(--gold); font-size: 1.8rem; display: block; margin: 0.1rem 0; }
+  .divider { width: 80px; height: 1px; background: var(--border); margin: 1.5rem auto; }
+  .date-venue { font-size: 0.85rem; color: var(--text-light); letter-spacing: 0.06em; margin-bottom: 2rem; }
+  .login-label { display: block; text-align: left; font-size: 0.73rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.4rem; margin-top: 1rem; }
+  .login-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.2s; }
+  .login-input:focus { border-color: var(--green-mid); }
+  .login-btn { margin-top: 1.8rem; width: 100%; padding: 0.9rem; background: var(--green-dark); color: var(--cream); border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; letter-spacing: 0.14em; cursor: pointer; transition: background 0.2s; }
+  .login-btn:hover { background: var(--green-mid); }
+  .login-error { margin-top: 1rem; font-size: 0.85rem; color: #a03030; display: none; }
+
+  /* APP */
+  #appPage { display: none; }
+  .site-header { background: white; border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(180,160,100,0.08); }
+  .header-title { font-family: 'Great Vibes', cursive; font-size: 1.9rem; color: var(--gold); }
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+  .guest-badge { display: flex; align-items: center; gap: 0.5rem; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 2rem; padding: 0.3rem 0.9rem; }
+  .guest-avatar { width: 26px; height: 26px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--green-dark); font-weight: 600; flex-shrink: 0; }
+  .guest-name-display { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--text-mid); }
+  .logout-btn { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); background: none; border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 2px; cursor: pointer; transition: color 0.2s; }
+  .logout-btn:hover { color: var(--text-dark); }
+
+  .hero { text-align: center; padding: 2.8rem 1rem 2rem; background: white; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+  .hero-leaf-l { position: absolute; left: -20px; top: -10px; width: 180px; opacity: 0.5; }
+  .hero-leaf-r { position: absolute; right: -20px; top: -10px; width: 180px; opacity: 0.5; transform: scaleX(-1); }
+  .hero-script { font-family: 'Great Vibes', cursive; font-size: 1.15rem; color: var(--text-light); display: block; margin-bottom: 0.3rem; }
+  .hero-names { font-size: 1.75rem; font-weight: 300; color: var(--text-dark); }
+  .hero-amp { font-family: 'Great Vibes', cursive; color: var(--gold); font-size: 2rem; margin: 0 0.4rem; }
+  .hero-date { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-light); margin-top: 0.6rem; }
+
+  .nav-tabs { display: flex; justify-content: center; background: var(--cream-dark); border-bottom: 1px solid var(--border); }
+  .nav-tab { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-light); background: none; border: none; padding: 1rem 2.2rem; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
+  .nav-tab:hover { color: var(--text-dark); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .content { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .welcome-banner { background: white; border: 1px solid var(--border); border-left: 3px solid var(--green-mid); border-radius: 3px; padding: 1.1rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
+  .welcome-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .welcome-text { font-size: 1rem; color: var(--text-mid); }
+  .welcome-text strong { color: var(--text-dark); font-weight: 500; }
+
+  .cta-card { background: linear-gradient(135deg, #f7faf6 0%, white 100%); border: 1px solid var(--border); border-radius: 4px; padding: 1.4rem 1.8rem; margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+  .cta-title { font-size: 1.15rem; color: var(--text-dark); margin-bottom: 0.2rem; }
+  .cta-sub { font-size: 0.83rem; color: var(--text-light); }
+  .cta-btn { padding: 0.7rem 1.6rem; background: var(--green-dark); color: var(--cream); border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .cta-btn:hover { background: var(--green-mid); }
+
+  /* Upload */
+  .upload-section { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 2rem; margin-bottom: 2.5rem; }
+  .section-title { font-size: 1.35rem; font-weight: 400; color: var(--text-dark); margin-bottom: 0.2rem; }
+  .section-sub { font-size: 0.83rem; color: var(--text-light); margin-bottom: 1.5rem; }
+
+  /* Key fix: file input hidden, label is the clickable zone */
+  #fileInput { display: none; }
+  .upload-label {
+    display: block; border: 1.5px dashed var(--border); border-radius: 4px;
+    padding: 2.5rem; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-label:hover, .upload-label.dragover { border-color: var(--green-mid); background: #f5faf4; }
+  .upload-label .upload-icon-lbl { font-size: 2rem; margin-bottom: 0.5rem; }
+  .upload-label .upload-main-txt { font-size: 1rem; color: var(--text-mid); margin-bottom: 0.3rem; }
+  .upload-hint { font-size: 0.83rem; color: var(--text-light); }
+
+  .upload-preview { margin-top: 1rem; display: none; align-items: center; gap: 1rem; padding: 0.8rem; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; }
+  .upload-preview img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+  .upload-preview-info { flex: 1; min-width: 0; }
+  .upload-preview-name { font-size: 0.85rem; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .upload-preview-size { font-size: 0.75rem; color: var(--text-light); margin-top: 0.15rem; }
+  .remove-file-btn { background: none; border: none; color: var(--text-light); font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
+  .remove-file-btn:hover { color: #a03030; }
+
+  .caption-row { display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
+  .caption-input { flex: 1; min-width: 160px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.2s; }
+  .caption-input:focus { border-color: var(--green-mid); }
+  .upload-submit { padding: 0.7rem 1.6rem; background: var(--gold); color: white; border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
+  .upload-submit:hover:not(:disabled) { background: var(--gold-light); }
+  .upload-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status-msg { font-size: 0.85rem; margin-top: 1rem; padding: 0.7rem 1rem; border-radius: 2px; display: none; }
+  .status-msg.success { background: #edf7ea; color: #3a6e30; border: 1px solid #c3e6bb; display: block; }
+  .status-msg.error   { background: #fdf0ee; color: #a03030; border: 1px solid #f5c5be; display: block; }
+
+  /* Gallery */
+  .gallery-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .album-page-title { font-family: 'Great Vibes', cursive; font-size: 2.3rem; color: var(--gold); }
+  .photo-count { font-size: 0.8rem; color: var(--text-light); letter-spacing: 0.08em; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+  .photo-card { background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+  .photo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(180,160,100,0.15); }
+  .photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+  .photo-card-body { padding: 0.8rem 1rem; }
+  .photo-caption { font-size: 0.95rem; color: var(--text-dark); line-height: 1.4; }
+  .photo-meta { font-size: 0.73rem; color: var(--text-light); margin-top: 0.3rem; }
+  .empty-gallery { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text-light); }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  .loading-msg { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-light); font-size: 0.9rem; }
+
+  @media (max-width: 540px) {
+    .site-header { padding: 0.8rem 1rem; }
+    .hero-names { font-size: 1.3rem; }
+    .hero { padding: 2rem 1rem 1.5rem; }
+    .content { padding: 1.5rem 1rem; }
+    .cta-card { flex-direction: column; align-items: flex-start; }
+    .cta-btn { width: 100%; text-align: center; }
+    .guest-name-display { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Leaf corners -->
+<svg class="leaf-corner" style="top:-5px;left:-5px;" viewBox="0 0 200 200" fill="none">
+  <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.5" transform="rotate(-30 60 50)"/>
+  <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.55" transform="rotate(-10 100 30)"/>
+  <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.45" transform="rotate(-50 40 90)"/>
+  <ellipse cx="130" cy="60" rx="20" ry="12" fill="#8fbc8f" opacity="0.4" transform="rotate(10 130 60)"/>
+  <line x1="60" y1="50" x2="20" y2="80" stroke="#6b8f62" stroke-width="1.5" opacity="0.4"/>
+  <line x1="100" y1="30" x2="60" y2="70" stroke="#6b8f62" stroke-width="1.5" opacity="0.4"/>
+  <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.4" transform="rotate(-60 75 120)"/>
+</svg>
+<svg class="leaf-corner" style="top:-5px;right:-5px;transform:scaleX(-1);" viewBox="0 0 200 200" fill="none">
+  <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.5" transform="rotate(-30 60 50)"/>
+  <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.55" transform="rotate(-10 100 30)"/>
+  <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.45" transform="rotate(-50 40 90)"/>
+  <line x1="60" y1="50" x2="20" y2="80" stroke="#6b8f62" stroke-width="1.5" opacity="0.4"/>
+  <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.4" transform="rotate(-60 75 120)"/>
+</svg>
+<svg class="leaf-corner" style="bottom:-5px;left:-5px;transform:scaleY(-1);" viewBox="0 0 200 200" fill="none">
+  <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.45" transform="rotate(-30 60 50)"/>
+  <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.5" transform="rotate(-10 100 30)"/>
+  <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.4" transform="rotate(-50 40 90)"/>
+  <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.38" transform="rotate(-60 75 120)"/>
+</svg>
+<svg class="leaf-corner" style="bottom:-5px;right:-5px;transform:scale(-1);" viewBox="0 0 200 200" fill="none">
+  <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.45" transform="rotate(-30 60 50)"/>
+  <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.5" transform="rotate(-10 100 30)"/>
+  <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.4" transform="rotate(-50 40 90)"/>
+  <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.38" transform="rotate(-60 75 120)"/>
+</svg>
+
+<!-- LOGIN -->
+<div id="loginPage" class="page">
+  <div class="login-card">
+    <div class="script-title">Save the Date</div>
+    <div class="serif-sub">For the wedding of</div>
+    <div class="couple-names">Sophie Grace Newstead</div>
+    <span class="ampersand">&</span>
+    <div class="couple-names">William Christopher Cousins</div>
+    <div class="divider"></div>
+    <div class="date-venue">Sunday 20th June 2027 · Bassmead Manor Barns, Staploe</div>
+    <label class="login-label" for="guestName">Your Name</label>
+    <input class="login-input" type="text" id="guestName" placeholder="e.g. Emma Johnson" autocomplete="name">
+    <label class="login-label" for="guestPass">Password</label>
+    <input class="login-input" type="password" id="guestPass" placeholder="Enter the guest password" autocomplete="current-password">
+    <button class="login-btn" id="loginBtn">Enter the Celebration</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appPage" class="page">
+  <header class="site-header">
+    <div class="header-title">Sophie & William</div>
+    <div class="header-right">
+      <div class="guest-badge">
+        <div class="guest-avatar" id="guestAvatar"></div>
+        <span class="guest-name-display" id="headerGuestName"></span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <div class="hero">
+    <svg class="hero-leaf-l" viewBox="0 0 200 200" fill="none">
+      <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.5" transform="rotate(-30 60 50)"/>
+      <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.55" transform="rotate(-10 100 30)"/>
+      <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.45" transform="rotate(-50 40 90)"/>
+      <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.4" transform="rotate(-60 75 120)"/>
+    </svg>
+    <svg class="hero-leaf-r" viewBox="0 0 200 200" fill="none">
+      <ellipse cx="60" cy="50" rx="28" ry="18" fill="#8fbc8f" opacity="0.5" transform="rotate(-30 60 50)"/>
+      <ellipse cx="100" cy="30" rx="24" ry="14" fill="#6b8f62" opacity="0.55" transform="rotate(-10 100 30)"/>
+      <ellipse cx="40" cy="90" rx="22" ry="13" fill="#a8c5a0" opacity="0.45" transform="rotate(-50 40 90)"/>
+      <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.4" transform="rotate(-60 75 120)"/>
+    </svg>
+    <span class="hero-script">Celebrating the wedding of</span>
+    <div>
+      <span class="hero-names">Sophie Grace Newstead</span>
+      <span class="hero-amp">&</span>
+      <span class="hero-names">William Christopher Cousins</span>
+    </div>
+    <div class="hero-date">Sunday 20th June 2027 · Bassmead Manor Barns, Staploe, St Neots</div>
+  </div>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" id="tabBtnGallery">Wedding Album</button>
+    <button class="nav-tab" id="tabBtnUpload">Share a Photo</button>
+  </nav>
+
+  <div class="content">
+
+    <!-- Gallery -->
+    <div id="tabGallery">
+      <div class="welcome-banner">
+        <div class="welcome-icon">🌿</div>
+        <div class="welcome-text">Welcome, <strong id="welcomeName"></strong> — so glad you're here to celebrate with us!</div>
+      </div>
+      <div class="cta-card">
+        <div>
+          <div class="cta-title">Have photos from the day?</div>
+          <div class="cta-sub">Share your favourite moments with all the guests</div>
+        </div>
+        <button class="cta-btn" id="ctaShareBtn">+ Share a Photo</button>
+      </div>
+      <div class="gallery-header">
+        <div class="album-page-title">Wedding Album</div>
+        <div class="photo-count" id="photoCount"></div>
+      </div>
+      <div id="galleryGrid" class="gallery-grid">
+        <div class="loading-msg">Loading photos…</div>
+      </div>
+    </div>
+
+    <!-- Upload -->
+    <div id="tabUpload" style="display:none;">
+      <div class="upload-section">
+        <div class="section-title">Share your memories</div>
+        <div class="section-sub">Upload a photo from the celebration to share with all guests</div>
+
+        <!-- Hidden real file input, label triggers it -->
+        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput" class="upload-label" id="uploadLabel">
+          <div class="upload-icon-lbl">🌿</div>
+          <div class="upload-main-txt">Click here to choose a photo</div>
+          <div class="upload-hint">JPG, PNG or WEBP · Max 8MB</div>
+        </label>
+
+        <div class="upload-preview" id="uploadPreview">
+          <img id="previewImg" src="" alt="preview">
+          <div class="upload-preview-info">
+            <div class="upload-preview-name" id="previewName"></div>
+            <div class="upload-preview-size" id="previewSize"></div>
+          </div>
+          <button class="remove-file-btn" id="removeFileBtn" title="Remove">✕</button>
+        </div>
+
+        <div class="caption-row">
+          <input class="caption-input" type="text" id="captionInput" placeholder="Add a caption (optional)…" maxlength="140">
+          <button class="upload-submit" id="submitBtn" disabled>Share Photo</button>
+        </div>
+        <div class="status-msg" id="uploadStatus"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const GUEST_PASSWORD = 'bassmead2027';
+const DB_NAME = 'WeddingAlbumDB';
+const DB_VER  = 1;
+const STORE   = 'photos';
+
+let currentGuest = '';
+let selectedFile  = null;
+let db            = null;
+
+// ── IndexedDB ──────────────────────────────────────────────────────────────
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        d.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbGetAll() {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = e => resolve(e.target.result.reverse());
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function dbAdd(record) {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).add(record);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+// ── Login ──────────────────────────────────────────────────────────────────
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
+['guestName','guestPass'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); })
+);
+
+function handleLogin() {
+  const name = document.getElementById('guestName').value.trim();
+  const pass = document.getElementById('guestPass').value.trim();
+  const err  = document.getElementById('loginError');
+  if (!name) { err.textContent = 'Please enter your name.'; err.style.display = 'block'; return; }
+  if (pass !== GUEST_PASSWORD) { err.textContent = 'Incorrect password — please try again.'; err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  currentGuest = name;
+  sessionStorage.setItem('sw_guest', name);
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appPage').style.display   = 'block';
+  const initials = currentGuest.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('guestAvatar').textContent     = initials;
+  document.getElementById('headerGuestName').textContent  = currentGuest;
+  document.getElementById('welcomeName').textContent      = currentGuest.split(' ')[0];
+  showTab('gallery');
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('sw_guest');
+  currentGuest = '';
+  resetForm();
+  document.getElementById('appPage').style.display   = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('guestPass').value = '';
+});
+
+// ── Tabs ───────────────────────────────────────────────────────────────────
+document.getElementById('tabBtnGallery').addEventListener('click', () => showTab('gallery'));
+document.getElementById('tabBtnUpload').addEventListener('click',  () => showTab('upload'));
+document.getElementById('ctaShareBtn').addEventListener('click',   () => showTab('upload'));
+
+function showTab(tab) {
+  document.getElementById('tabGallery').style.display = tab === 'gallery' ? 'block' : 'none';
+  document.getElementById('tabUpload').style.display  = tab === 'upload'  ? 'block' : 'none';
+  document.getElementById('tabBtnGallery').classList.toggle('active', tab === 'gallery');
+  document.getElementById('tabBtnUpload').classList.toggle('active',  tab === 'upload');
+  if (tab === 'gallery') loadGallery();
+}
+
+// ── File handling ──────────────────────────────────────────────────────────
+const fileInput   = document.getElementById('fileInput');
+const uploadLabel = document.getElementById('uploadLabel');
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+uploadLabel.addEventListener('dragover',  e => { e.preventDefault(); uploadLabel.classList.add('dragover'); });
+uploadLabel.addEventListener('dragleave', () => uploadLabel.classList.remove('dragover'));
+uploadLabel.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadLabel.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+document.getElementById('removeFileBtn').addEventListener('click', resetForm);
+
+function handleFile(file) {
+  if (!file.type.startsWith('image/')) { showStatus('Please choose an image file (JPG, PNG or WEBP).', 'error'); return; }
+  if (file.size > 8 * 1024 * 1024)    { showStatus('That photo is over 8MB — please choose a smaller one.', 'error'); return; }
+
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('previewImg').src          = ev.target.result;
+    document.getElementById('previewName').textContent  = file.name;
+    document.getElementById('previewSize').textContent  = (file.size / 1024).toFixed(0) + ' KB';
+    document.getElementById('uploadPreview').style.display = 'flex';
+    document.getElementById('submitBtn').disabled = false;
+    uploadLabel.style.display = 'none';
+  };
+  reader.onerror = () => showStatus('Could not read that file — please try another.', 'error');
+  reader.readAsDataURL(file);
+}
+
+function resetForm() {
+  selectedFile = null;
+  fileInput.value = '';
+  document.getElementById('previewImg').src           = '';
+  document.getElementById('previewName').textContent   = '';
+  document.getElementById('previewSize').textContent   = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('captionInput').value        = '';
+  document.getElementById('submitBtn').disabled        = true;
+  document.getElementById('uploadStatus').className    = 'status-msg';
+  uploadLabel.style.display = 'block';
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────────
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  if (!selectedFile) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Sharing…';
+  try {
+    const dataUrl = await toDataURL(selectedFile);
+    await dbAdd({
+      guest:     currentGuest,
+      caption:   document.getElementById('captionInput').value.trim(),
+      dataUrl:   dataUrl,
+      timestamp: Date.now()
+    });
+    showStatus('Your photo has been shared — thank you! 🌿', 'success');
+    resetForm();
+    btn.textContent = 'Share Photo';
+    setTimeout(() => showTab('gallery'), 1600);
+  } catch(err) {
+    console.error(err);
+    showStatus('Something went wrong — please try again.', 'error');
+    btn.disabled = false; btn.textContent = 'Share Photo';
+  }
+});
+
+function toDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload  = e => resolve(e.target.result);
+    r.onerror = e => reject(e.target.error);
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Gallery ────────────────────────────────────────────────────────────────
+async function loadGallery() {
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = '<div class="loading-msg">Loading photos…</div>';
+  try {
+    const photos = await dbGetAll();
+    document.getElementById('photoCount').textContent =
+      photos.length ? photos.length + ' photo' + (photos.length !== 1 ? 's' : '') : '';
+    if (!photos.length) {
+      grid.innerHTML = '<div class="empty-gallery"><div class="empty-icon">🌿</div><p>No photos yet — be the first to share one!</p></div>';
+      return;
+    }
+    grid.innerHTML = '';
+    for (const p of photos) {
+      const card = document.createElement('div');
+      card.className = 'photo-card';
+      const date = new Date(p.timestamp).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      card.innerHTML = `
+        <img src="${p.dataUrl}" alt="${p.caption ? esc(p.caption) : 'Wedding photo'}" loading="lazy">
+        <div class="photo-card-body">
+          ${p.caption ? `<div class="photo-caption">${esc(p.caption)}</div>` : ''}
+          <div class="photo-meta">${esc(p.guest)} · ${date}</div>
+        </div>`;
+      grid.appendChild(card);
+    }
+  } catch(err) {
+    console.error(err);
+    grid.innerHTML = '<div class="empty-gallery"><p>Unable to load photos — please refresh.</p></div>';
+  }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('uploadStatus');
+  el.textContent = msg; el.className = 'status-msg ' + type;
+  if (type === 'success') setTimeout(() => { el.className = 'status-msg'; }, 6000);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+(async () => {
+  try { db = await openDB(); } catch(e) { console.error('DB error:', e); }
+  const saved = sessionStorage.getItem('sw_guest');
+  if (saved) { currentGuest = saved; showApp(); }
+})();
+</script>
+</body>
+</html>
