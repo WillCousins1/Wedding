@@ -5,6 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sophie & William — Wedding Album</title>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp }                      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, addDoc,
+           onSnapshot, orderBy, query }         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBb4NoIyi4ylYPMF1ujpAVoGXAymEg-ILg",
+    authDomain:        "sophieandwilliamswedding-a8ee0.firebaseapp.com",
+    projectId:         "sophieandwilliamswedding-a8ee0",
+    storageBucket:     "sophieandwilliamswedding-a8ee0.firebasestorage.app",
+    messagingSenderId: "201143249456",
+    appId:             "1:201143249456:web:52fd80103f731a2719dbf5",
+    measurementId:     "G-Z0S34H4YH0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  window._db         = db;
+  window._fbReady    = true;
+  window._collection = collection;
+  window._addDoc     = addDoc;
+  window._onSnapshot = onSnapshot;
+  window._orderBy    = orderBy;
+  window._query      = query;
+
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -43,7 +73,7 @@
   .guest-badge { display: flex; align-items: center; gap: 0.5rem; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 2rem; padding: 0.3rem 0.9rem; }
   .guest-avatar { width: 26px; height: 26px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--green-dark); font-weight: 600; flex-shrink: 0; }
   .guest-name-display { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--text-mid); }
-  .logout-btn { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); background: none; border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 2px; cursor: pointer; transition: color 0.2s; }
+  .logout-btn { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); background: none; border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 2px; cursor: pointer; }
   .logout-btn:hover { color: var(--text-dark); }
 
   .hero { text-align: center; padding: 2.8rem 1rem 2rem; background: white; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
@@ -76,19 +106,12 @@
   .upload-section { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 2rem; margin-bottom: 2.5rem; }
   .section-title { font-size: 1.35rem; font-weight: 400; color: var(--text-dark); margin-bottom: 0.2rem; }
   .section-sub { font-size: 0.83rem; color: var(--text-light); margin-bottom: 1.5rem; }
-
-  /* Key fix: file input hidden, label is the clickable zone */
   #fileInput { display: none; }
-  .upload-label {
-    display: block; border: 1.5px dashed var(--border); border-radius: 4px;
-    padding: 2.5rem; text-align: center; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
+  .upload-label { display: block; border: 1.5px dashed var(--border); border-radius: 4px; padding: 2.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
   .upload-label:hover, .upload-label.dragover { border-color: var(--green-mid); background: #f5faf4; }
   .upload-label .upload-icon-lbl { font-size: 2rem; margin-bottom: 0.5rem; }
   .upload-label .upload-main-txt { font-size: 1rem; color: var(--text-mid); margin-bottom: 0.3rem; }
   .upload-hint { font-size: 0.83rem; color: var(--text-light); }
-
   .upload-preview { margin-top: 1rem; display: none; align-items: center; gap: 1rem; padding: 0.8rem; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; }
   .upload-preview img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
   .upload-preview-info { flex: 1; min-width: 0; }
@@ -96,17 +119,17 @@
   .upload-preview-size { font-size: 0.75rem; color: var(--text-light); margin-top: 0.15rem; }
   .remove-file-btn { background: none; border: none; color: var(--text-light); font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
   .remove-file-btn:hover { color: #a03030; }
-
   .caption-row { display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
   .caption-input { flex: 1; min-width: 160px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.2s; }
   .caption-input:focus { border-color: var(--green-mid); }
   .upload-submit { padding: 0.7rem 1.6rem; background: var(--gold); color: white; border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
   .upload-submit:hover:not(:disabled) { background: var(--gold-light); }
   .upload-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-
   .status-msg { font-size: 0.85rem; margin-top: 1rem; padding: 0.7rem 1rem; border-radius: 2px; display: none; }
   .status-msg.success { background: #edf7ea; color: #3a6e30; border: 1px solid #c3e6bb; display: block; }
   .status-msg.error   { background: #fdf0ee; color: #a03030; border: 1px solid #f5c5be; display: block; }
+  .progress-bar-wrap { margin-top: 1rem; display: none; background: var(--cream-dark); border-radius: 2px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0%; background: var(--green-mid); transition: width 0.3s; }
 
   /* Gallery */
   .gallery-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
@@ -254,24 +277,23 @@
       <div class="upload-section">
         <div class="section-title">Share your memories</div>
         <div class="section-sub">Upload a photo from the celebration to share with all guests</div>
-
-        <!-- Hidden real file input, label triggers it -->
         <input type="file" id="fileInput" accept="image/*">
         <label for="fileInput" class="upload-label" id="uploadLabel">
           <div class="upload-icon-lbl">🌿</div>
           <div class="upload-main-txt">Click here to choose a photo</div>
           <div class="upload-hint">JPG, PNG or WEBP · Max 8MB</div>
         </label>
-
         <div class="upload-preview" id="uploadPreview">
           <img id="previewImg" src="" alt="preview">
           <div class="upload-preview-info">
             <div class="upload-preview-name" id="previewName"></div>
             <div class="upload-preview-size" id="previewSize"></div>
           </div>
-          <button class="remove-file-btn" id="removeFileBtn" title="Remove">✕</button>
+          <button class="remove-file-btn" id="removeFileBtn">✕</button>
         </div>
-
+        <div class="progress-bar-wrap" id="progressWrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
         <div class="caption-row">
           <input class="caption-input" type="text" id="captionInput" placeholder="Add a caption (optional)…" maxlength="140">
           <button class="upload-submit" id="submitBtn" disabled>Share Photo</button>
@@ -284,49 +306,27 @@
 </div>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
 const GUEST_PASSWORD = 'bassmead2027';
-const DB_NAME = 'WeddingAlbumDB';
-const DB_VER  = 1;
-const STORE   = 'photos';
+
+// Cloudinary — free image hosting (25GB free, no credit card needed)
+// TO SET UP: go to cloudinary.com, create a free account, then:
+// 1. Find your Cloud Name on the dashboard and replace below
+// 2. Go to Settings > Upload > Add upload preset, set to "Unsigned", copy name below
+const CLOUDINARY_CLOUD_NAME   = 'dtkfauneu';
+const CLOUDINARY_UPLOAD_PRESET = 'Wedding';
 
 let currentGuest = '';
 let selectedFile  = null;
-let db            = null;
+let unsubscribe   = null;
 
-// ── IndexedDB ──────────────────────────────────────────────────────────────
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VER);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        d.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
-      }
-    };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror   = e => reject(e.target.error);
-  });
-}
+// ── Firebase ready ────────────────────────────────────────────────────────
+document.addEventListener('firebase-ready', () => {
+  const saved = sessionStorage.getItem('sw_guest');
+  if (saved) { currentGuest = saved; showApp(); }
+});
 
-function dbGetAll() {
-  return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = e => resolve(e.target.result.reverse());
-    req.onerror   = e => reject(e.target.error);
-  });
-}
-
-function dbAdd(record) {
-  return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readwrite');
-    const req = tx.objectStore(STORE).add(record);
-    req.onsuccess = () => resolve();
-    req.onerror   = e => reject(e.target.error);
-  });
-}
-
-// ── Login ──────────────────────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────────────────
 document.getElementById('loginBtn').addEventListener('click', handleLogin);
 ['guestName','guestPass'].forEach(id =>
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); })
@@ -357,13 +357,15 @@ function showApp() {
 document.getElementById('logoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('sw_guest');
   currentGuest = '';
+  selectedFile = null;
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
   resetForm();
   document.getElementById('appPage').style.display   = 'none';
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('guestPass').value = '';
 });
 
-// ── Tabs ───────────────────────────────────────────────────────────────────
+// ── Tabs ──────────────────────────────────────────────────────────────────
 document.getElementById('tabBtnGallery').addEventListener('click', () => showTab('gallery'));
 document.getElementById('tabBtnUpload').addEventListener('click',  () => showTab('upload'));
 document.getElementById('ctaShareBtn').addEventListener('click',   () => showTab('upload'));
@@ -376,28 +378,24 @@ function showTab(tab) {
   if (tab === 'gallery') loadGallery();
 }
 
-// ── File handling ──────────────────────────────────────────────────────────
+// ── File handling ─────────────────────────────────────────────────────────
 const fileInput   = document.getElementById('fileInput');
 const uploadLabel = document.getElementById('uploadLabel');
 
 fileInput.addEventListener('change', e => {
   if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
 });
-
 uploadLabel.addEventListener('dragover',  e => { e.preventDefault(); uploadLabel.classList.add('dragover'); });
 uploadLabel.addEventListener('dragleave', () => uploadLabel.classList.remove('dragover'));
 uploadLabel.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadLabel.classList.remove('dragover');
+  e.preventDefault(); uploadLabel.classList.remove('dragover');
   if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
-
 document.getElementById('removeFileBtn').addEventListener('click', resetForm);
 
 function handleFile(file) {
   if (!file.type.startsWith('image/')) { showStatus('Please choose an image file (JPG, PNG or WEBP).', 'error'); return; }
   if (file.size > 8 * 1024 * 1024)    { showStatus('That photo is over 8MB — please choose a smaller one.', 'error'); return; }
-
   selectedFile = file;
   const reader = new FileReader();
   reader.onload = ev => {
@@ -408,64 +406,99 @@ function handleFile(file) {
     document.getElementById('submitBtn').disabled = false;
     uploadLabel.style.display = 'none';
   };
-  reader.onerror = () => showStatus('Could not read that file — please try another.', 'error');
   reader.readAsDataURL(file);
 }
 
 function resetForm() {
   selectedFile = null;
   fileInput.value = '';
-  document.getElementById('previewImg').src           = '';
-  document.getElementById('previewName').textContent   = '';
-  document.getElementById('previewSize').textContent   = '';
-  document.getElementById('uploadPreview').style.display = 'none';
-  document.getElementById('captionInput').value        = '';
-  document.getElementById('submitBtn').disabled        = true;
-  document.getElementById('uploadStatus').className    = 'status-msg';
+  document.getElementById('previewImg').src              = '';
+  document.getElementById('previewName').textContent      = '';
+  document.getElementById('previewSize').textContent      = '';
+  document.getElementById('uploadPreview').style.display  = 'none';
+  document.getElementById('captionInput').value           = '';
+  document.getElementById('submitBtn').disabled           = true;
+  document.getElementById('uploadStatus').className       = 'status-msg';
+  document.getElementById('progressWrap').style.display   = 'none';
+  document.getElementById('progressBar').style.width      = '0%';
   uploadLabel.style.display = 'block';
 }
 
-// ── Submit ─────────────────────────────────────────────────────────────────
+// ── Submit: upload to Cloudinary, save URL to Firestore ───────────────────
 document.getElementById('submitBtn').addEventListener('click', async () => {
-  if (!selectedFile) return;
+  if (!selectedFile || !window._fbReady) return;
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = 'Sharing…';
+  btn.disabled = true; btn.textContent = 'Uploading…';
+  document.getElementById('progressWrap').style.display = 'block';
+
   try {
-    const dataUrl = await toDataURL(selectedFile);
-    await dbAdd({
-      guest:     currentGuest,
-      caption:   document.getElementById('captionInput').value.trim(),
-      dataUrl:   dataUrl,
-      timestamp: Date.now()
+    // 1. Upload image to Cloudinary (free, unsigned)
+    animateProgress(0, 60, 1500);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body:   formData
     });
+    const data = await res.json();
+    if (!res.ok || !data.secure_url) throw new Error(data.error?.message || 'Upload failed');
+    animateProgress(60, 90, 400);
+
+    // 2. Save photo metadata to Firestore
+    await window._addDoc(
+      window._collection(window._db, 'photos'),
+      {
+        guest:     currentGuest,
+        caption:   document.getElementById('captionInput').value.trim(),
+        url:       data.secure_url,
+        timestamp: Date.now()
+      }
+    );
+    animateProgress(90, 100, 200);
+
     showStatus('Your photo has been shared — thank you! 🌿', 'success');
     resetForm();
     btn.textContent = 'Share Photo';
     setTimeout(() => showTab('gallery'), 1600);
+
   } catch(err) {
     console.error(err);
-    showStatus('Something went wrong — please try again.', 'error');
+    showStatus('Upload failed — please check your connection and try again.', 'error');
     btn.disabled = false; btn.textContent = 'Share Photo';
+    document.getElementById('progressWrap').style.display = 'none';
   }
 });
 
-function toDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload  = e => resolve(e.target.result);
-    r.onerror = e => reject(e.target.error);
-    r.readAsDataURL(file);
-  });
+function animateProgress(from, to, duration) {
+  const bar = document.getElementById('progressBar');
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    bar.style.width = (from + (to - from) * p) + '%';
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
-// ── Gallery ────────────────────────────────────────────────────────────────
-async function loadGallery() {
+// ── Gallery — real-time Firestore listener ────────────────────────────────
+function loadGallery() {
+  if (!window._fbReady) return;
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML = '<div class="loading-msg">Loading photos…</div>';
-  try {
-    const photos = await dbGetAll();
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+
+  const q = window._query(
+    window._collection(window._db, 'photos'),
+    window._orderBy('timestamp', 'desc')
+  );
+
+  unsubscribe = window._onSnapshot(q, snapshot => {
+    const photos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('photoCount').textContent =
       photos.length ? photos.length + ' photo' + (photos.length !== 1 ? 's' : '') : '';
+
     if (!photos.length) {
       grid.innerHTML = '<div class="empty-gallery"><div class="empty-icon">🌿</div><p>No photos yet — be the first to share one!</p></div>';
       return;
@@ -476,17 +509,17 @@ async function loadGallery() {
       card.className = 'photo-card';
       const date = new Date(p.timestamp).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
       card.innerHTML = `
-        <img src="${p.dataUrl}" alt="${p.caption ? esc(p.caption) : 'Wedding photo'}" loading="lazy">
+        <img src="${esc(p.url)}" alt="${p.caption ? esc(p.caption) : 'Wedding photo'}" loading="lazy">
         <div class="photo-card-body">
           ${p.caption ? `<div class="photo-caption">${esc(p.caption)}</div>` : ''}
           <div class="photo-meta">${esc(p.guest)} · ${date}</div>
         </div>`;
       grid.appendChild(card);
     }
-  } catch(err) {
+  }, err => {
     console.error(err);
     grid.innerHTML = '<div class="empty-gallery"><p>Unable to load photos — please refresh.</p></div>';
-  }
+  });
 }
 
 function showStatus(msg, type) {
@@ -498,13 +531,6 @@ function showStatus(msg, type) {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-// ── Boot ───────────────────────────────────────────────────────────────────
-(async () => {
-  try { db = await openDB(); } catch(e) { console.error('DB error:', e); }
-  const saved = sessionStorage.getItem('sw_guest');
-  if (saved) { currentGuest = saved; showApp(); }
-})();
 </script>
 </body>
 </html>
