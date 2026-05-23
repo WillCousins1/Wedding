@@ -7,9 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 
 <script type="module">
-  import { initializeApp }                      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { initializeApp }                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getFirestore, collection, addDoc,
-           onSnapshot, orderBy, query }         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+           onSnapshot, orderBy, query,
+           deleteDoc, doc }                       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey:            "AIzaSyBb4NoIyi4ylYPMF1ujpAVoGXAymEg-ILg",
@@ -31,6 +32,8 @@
   window._onSnapshot = onSnapshot;
   window._orderBy    = orderBy;
   window._query      = query;
+  window._deleteDoc  = deleteDoc;
+  window._doc        = doc;
 
   document.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -43,6 +46,7 @@
     --cream: #faf9f5; --cream-dark: #f2ede3;
     --text-dark: #2c2415; --text-mid: #5a4e38; --text-light: #8a7a60;
     --border: #ddd5c0;
+    --red: #a03030; --red-light: #fdf0ee;
   }
   body { font-family: 'Cormorant Garamond', serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
   .leaf-corner { position: fixed; width: 200px; opacity: 0.8; pointer-events: none; z-index: 0; }
@@ -63,7 +67,7 @@
   .login-input:focus { border-color: var(--green-mid); }
   .login-btn { margin-top: 1.8rem; width: 100%; padding: 0.9rem; background: var(--green-dark); color: var(--cream); border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; letter-spacing: 0.14em; cursor: pointer; transition: background 0.2s; }
   .login-btn:hover { background: var(--green-mid); }
-  .login-error { margin-top: 1rem; font-size: 0.85rem; color: #a03030; display: none; }
+  .login-error { margin-top: 1rem; font-size: 0.85rem; color: var(--red); display: none; }
 
   /* APP */
   #appPage { display: none; }
@@ -72,7 +76,9 @@
   .header-right { display: flex; align-items: center; gap: 1rem; }
   .guest-badge { display: flex; align-items: center; gap: 0.5rem; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 2rem; padding: 0.3rem 0.9rem; }
   .guest-avatar { width: 26px; height: 26px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--green-dark); font-weight: 600; flex-shrink: 0; }
+  .guest-avatar.admin { background: var(--gold); color: white; }
   .guest-name-display { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--text-mid); }
+  .admin-badge { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; background: var(--gold); color: white; padding: 0.1rem 0.5rem; border-radius: 2rem; margin-left: 0.3rem; }
   .logout-btn { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); background: none; border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 2px; cursor: pointer; }
   .logout-btn:hover { color: var(--text-dark); }
 
@@ -92,6 +98,7 @@
   .content { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
 
   .welcome-banner { background: white; border: 1px solid var(--border); border-left: 3px solid var(--green-mid); border-radius: 3px; padding: 1.1rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
+  .welcome-banner.admin-banner { border-left-color: var(--gold); }
   .welcome-icon { font-size: 1.4rem; flex-shrink: 0; }
   .welcome-text { font-size: 1rem; color: var(--text-mid); }
   .welcome-text strong { color: var(--text-dark); font-weight: 500; }
@@ -118,7 +125,7 @@
   .upload-preview-name { font-size: 0.85rem; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .upload-preview-size { font-size: 0.75rem; color: var(--text-light); margin-top: 0.15rem; }
   .remove-file-btn { background: none; border: none; color: var(--text-light); font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
-  .remove-file-btn:hover { color: #a03030; }
+  .remove-file-btn:hover { color: var(--red); }
   .caption-row { display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
   .caption-input { flex: 1; min-width: 160px; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.2s; }
   .caption-input:focus { border-color: var(--green-mid); }
@@ -127,24 +134,55 @@
   .upload-submit:disabled { opacity: 0.4; cursor: not-allowed; }
   .status-msg { font-size: 0.85rem; margin-top: 1rem; padding: 0.7rem 1rem; border-radius: 2px; display: none; }
   .status-msg.success { background: #edf7ea; color: #3a6e30; border: 1px solid #c3e6bb; display: block; }
-  .status-msg.error   { background: #fdf0ee; color: #a03030; border: 1px solid #f5c5be; display: block; }
+  .status-msg.error   { background: var(--red-light); color: var(--red); border: 1px solid #f5c5be; display: block; }
   .progress-bar-wrap { margin-top: 1rem; display: none; background: var(--cream-dark); border-radius: 2px; height: 6px; overflow: hidden; }
   .progress-bar { height: 100%; width: 0%; background: var(--green-mid); transition: width 0.3s; }
 
   /* Gallery */
-  .gallery-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .gallery-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
   .album-page-title { font-family: 'Great Vibes', cursive; font-size: 2.3rem; color: var(--gold); }
   .photo-count { font-size: 0.8rem; color: var(--text-light); letter-spacing: 0.08em; }
   .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
-  .photo-card { background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+
+  /* Photo card */
+  .photo-card { background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
   .photo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(180,160,100,0.15); }
   .photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
   .photo-card-body { padding: 0.8rem 1rem; }
   .photo-caption { font-size: 0.95rem; color: var(--text-dark); line-height: 1.4; }
   .photo-meta { font-size: 0.73rem; color: var(--text-light); margin-top: 0.3rem; }
+
+  /* Delete button — only visible to admins */
+  .delete-btn {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    background: rgba(160, 48, 48, 0.88); color: white;
+    border: none; border-radius: 50%; width: 30px; height: 30px;
+    font-size: 1rem; line-height: 1; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+    backdrop-filter: blur(2px);
+  }
+  .delete-btn:hover { background: #7a1e1e; transform: scale(1.1); }
+  .is-admin .delete-btn { display: flex; }
+
+  /* Admin info bar */
+  .admin-info-bar { background: #fffbf0; border: 1px solid #ffe4a0; border-radius: 3px; padding: 0.7rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.83rem; color: #7a5c00; display: none; align-items: center; gap: 0.6rem; }
+  .admin-info-bar.visible { display: flex; }
+
   .empty-gallery { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text-light); }
   .empty-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
   .loading-msg { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-light); font-size: 0.9rem; }
+
+  /* Delete confirm overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .overlay.visible { display: flex; }
+  .confirm-box { background: white; border-radius: 4px; padding: 2rem; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .confirm-box h3 { font-size: 1.2rem; font-weight: 400; color: var(--text-dark); margin-bottom: 0.5rem; }
+  .confirm-box p { font-size: 0.88rem; color: var(--text-light); margin-bottom: 1.5rem; }
+  .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+  .confirm-cancel { padding: 0.6rem 1.4rem; background: none; border: 1px solid var(--border); border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; cursor: pointer; color: var(--text-mid); }
+  .confirm-delete { padding: 0.6rem 1.4rem; background: var(--red); color: white; border: none; border-radius: 2px; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+  .confirm-delete:hover { background: #7a1e1e; }
 
   @media (max-width: 540px) {
     .site-header { padding: 0.8rem 1rem; }
@@ -189,6 +227,18 @@
   <ellipse cx="75" cy="120" rx="18" ry="10" fill="#a8c5a0" opacity="0.38" transform="rotate(-60 75 120)"/>
 </svg>
 
+<!-- Delete confirm overlay -->
+<div class="overlay" id="deleteOverlay">
+  <div class="confirm-box">
+    <h3>Remove this photo?</h3>
+    <p>This will permanently delete it from the wedding album for all guests.</p>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" id="cancelDelete">Keep it</button>
+      <button class="confirm-delete" id="confirmDelete">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="loginPage" class="page">
   <div class="login-card">
@@ -202,7 +252,7 @@
     <label class="login-label" for="guestName">Your Name</label>
     <input class="login-input" type="text" id="guestName" placeholder="e.g. Emma Johnson" autocomplete="name">
     <label class="login-label" for="guestPass">Password</label>
-    <input class="login-input" type="password" id="guestPass" placeholder="Enter the guest password" autocomplete="current-password">
+    <input class="login-input" type="password" id="guestPass" placeholder="Enter the password" autocomplete="current-password">
     <button class="login-btn" id="loginBtn">Enter the Celebration</button>
     <div class="login-error" id="loginError"></div>
   </div>
@@ -216,6 +266,7 @@
       <div class="guest-badge">
         <div class="guest-avatar" id="guestAvatar"></div>
         <span class="guest-name-display" id="headerGuestName"></span>
+        <span class="admin-badge" id="adminBadge" style="display:none;">Admin</span>
       </div>
       <button class="logout-btn" id="logoutBtn">Sign out</button>
     </div>
@@ -252,10 +303,15 @@
 
     <!-- Gallery -->
     <div id="tabGallery">
-      <div class="welcome-banner">
-        <div class="welcome-icon">🌿</div>
+      <div class="welcome-banner" id="welcomeBanner">
+        <div class="welcome-icon" id="welcomeIcon">🌿</div>
         <div class="welcome-text">Welcome, <strong id="welcomeName"></strong> — so glad you're here to celebrate with us!</div>
       </div>
+
+      <div class="admin-info-bar" id="adminInfoBar">
+        👑 You're logged in as an admin. Tap the <strong style="color:#a03030;">✕</strong> button on any photo to remove it from the album.
+      </div>
+
       <div class="cta-card">
         <div>
           <div class="cta-title">Have photos from the day?</div>
@@ -308,22 +364,32 @@
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const GUEST_PASSWORD = 'bassmead2027';
+const ADMIN_PASSWORD = 'sophie&william2027'; // Only Sophie & William know this
 
-// Cloudinary — free image hosting (25GB free, no credit card needed)
-// TO SET UP: go to cloudinary.com, create a free account, then:
-// 1. Find your Cloud Name on the dashboard and replace below
-// 2. Go to Settings > Upload > Add upload preset, set to "Unsigned", copy name below
-const CLOUDINARY_CLOUD_NAME   = 'dtkfauneu';
+const CLOUDINARY_CLOUD_NAME    = 'dtkfauneu';
 const CLOUDINARY_UPLOAD_PRESET = 'Wedding';
 
+// Admin names — shown in header when logged in as admin
+const ADMIN_ACCOUNTS = [
+  { name: 'Sophie',  password: ADMIN_PASSWORD },
+  { name: 'William', password: ADMIN_PASSWORD }
+];
+
 let currentGuest = '';
-let selectedFile  = null;
-let unsubscribe   = null;
+let isAdmin      = false;
+let selectedFile = null;
+let unsubscribe  = null;
+let pendingDeleteId = null;
 
 // ── Firebase ready ────────────────────────────────────────────────────────
 document.addEventListener('firebase-ready', () => {
-  const saved = sessionStorage.getItem('sw_guest');
-  if (saved) { currentGuest = saved; showApp(); }
+  const saved      = sessionStorage.getItem('sw_guest');
+  const savedAdmin = sessionStorage.getItem('sw_admin') === 'true';
+  if (saved) {
+    currentGuest = saved;
+    isAdmin      = savedAdmin;
+    showApp();
+  }
 });
 
 // ── Login ─────────────────────────────────────────────────────────────────
@@ -336,33 +402,77 @@ function handleLogin() {
   const name = document.getElementById('guestName').value.trim();
   const pass = document.getElementById('guestPass').value.trim();
   const err  = document.getElementById('loginError');
+
   if (!name) { err.textContent = 'Please enter your name.'; err.style.display = 'block'; return; }
-  if (pass !== GUEST_PASSWORD) { err.textContent = 'Incorrect password — please try again.'; err.style.display = 'block'; return; }
-  err.style.display = 'none';
-  currentGuest = name;
-  sessionStorage.setItem('sw_guest', name);
-  showApp();
+
+  // Check admin password first
+  if (pass === ADMIN_PASSWORD) {
+    err.style.display = 'none';
+    currentGuest = name;
+    isAdmin      = true;
+    sessionStorage.setItem('sw_guest', name);
+    sessionStorage.setItem('sw_admin', 'true');
+    showApp();
+    return;
+  }
+
+  // Check guest password
+  if (pass === GUEST_PASSWORD) {
+    err.style.display = 'none';
+    currentGuest = name;
+    isAdmin      = false;
+    sessionStorage.setItem('sw_guest', name);
+    sessionStorage.setItem('sw_admin', 'false');
+    showApp();
+    return;
+  }
+
+  err.textContent = 'Incorrect password — please try again.';
+  err.style.display = 'block';
 }
 
 function showApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appPage').style.display   = 'block';
+
   const initials = currentGuest.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('guestAvatar').textContent     = initials;
-  document.getElementById('headerGuestName').textContent  = currentGuest;
-  document.getElementById('welcomeName').textContent      = currentGuest.split(' ')[0];
+  const avatar   = document.getElementById('guestAvatar');
+  avatar.textContent = initials;
+  if (isAdmin) avatar.classList.add('admin'); else avatar.classList.remove('admin');
+
+  document.getElementById('headerGuestName').textContent = currentGuest;
+  document.getElementById('welcomeName').textContent     = currentGuest.split(' ')[0];
+  document.getElementById('adminBadge').style.display    = isAdmin ? 'inline' : 'none';
+
+  // Admin welcome banner
+  const banner = document.getElementById('welcomeBanner');
+  const infoBar = document.getElementById('adminInfoBar');
+  if (isAdmin) {
+    banner.classList.add('admin-banner');
+    document.getElementById('welcomeIcon').textContent = '👑';
+    infoBar.classList.add('visible');
+  } else {
+    banner.classList.remove('admin-banner');
+    document.getElementById('welcomeIcon').textContent = '🌿';
+    infoBar.classList.remove('visible');
+  }
+
+  // Apply admin class to gallery grid for CSS delete button visibility
+  document.getElementById('galleryGrid').classList.toggle('is-admin', isAdmin);
+
   showTab('gallery');
 }
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('sw_guest');
-  currentGuest = '';
-  selectedFile = null;
+  sessionStorage.removeItem('sw_admin');
+  currentGuest = ''; isAdmin = false; selectedFile = null;
   if (unsubscribe) { unsubscribe(); unsubscribe = null; }
   resetForm();
   document.getElementById('appPage').style.display   = 'none';
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('guestPass').value = '';
+  document.getElementById('guestName').value = '';
 });
 
 // ── Tabs ──────────────────────────────────────────────────────────────────
@@ -410,8 +520,7 @@ function handleFile(file) {
 }
 
 function resetForm() {
-  selectedFile = null;
-  fileInput.value = '';
+  selectedFile = null; fileInput.value = '';
   document.getElementById('previewImg').src              = '';
   document.getElementById('previewName').textContent      = '';
   document.getElementById('previewSize').textContent      = '';
@@ -424,7 +533,7 @@ function resetForm() {
   uploadLabel.style.display = 'block';
 }
 
-// ── Submit: upload to Cloudinary, save URL to Firestore ───────────────────
+// ── Submit ────────────────────────────────────────────────────────────────
 document.getElementById('submitBtn').addEventListener('click', async () => {
   if (!selectedFile || !window._fbReady) return;
   const btn = document.getElementById('submitBtn');
@@ -432,35 +541,26 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   document.getElementById('progressWrap').style.display = 'block';
 
   try {
-    // 1. Upload image to Cloudinary (free, unsigned)
     animateProgress(0, 60, 1500);
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body:   formData
-    });
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body:formData });
     const data = await res.json();
     if (!res.ok || !data.secure_url) throw new Error(data.error?.message || 'Upload failed');
     animateProgress(60, 90, 400);
 
-    // 2. Save photo metadata to Firestore
-    await window._addDoc(
-      window._collection(window._db, 'photos'),
-      {
-        guest:     currentGuest,
-        caption:   document.getElementById('captionInput').value.trim(),
-        url:       data.secure_url,
-        timestamp: Date.now()
-      }
-    );
+    await window._addDoc(window._collection(window._db, 'photos'), {
+      guest:     currentGuest,
+      caption:   document.getElementById('captionInput').value.trim(),
+      url:       data.secure_url,
+      timestamp: Date.now()
+    });
     animateProgress(90, 100, 200);
 
     showStatus('Your photo has been shared — thank you! 🌿', 'success');
-    resetForm();
-    btn.textContent = 'Share Photo';
+    resetForm(); btn.textContent = 'Share Photo';
     setTimeout(() => showTab('gallery'), 1600);
 
   } catch(err) {
@@ -482,7 +582,7 @@ function animateProgress(from, to, duration) {
   requestAnimationFrame(step);
 }
 
-// ── Gallery — real-time Firestore listener ────────────────────────────────
+// ── Gallery ───────────────────────────────────────────────────────────────
 function loadGallery() {
   if (!window._fbReady) return;
   const grid = document.getElementById('galleryGrid');
@@ -503,12 +603,17 @@ function loadGallery() {
       grid.innerHTML = '<div class="empty-gallery"><div class="empty-icon">🌿</div><p>No photos yet — be the first to share one!</p></div>';
       return;
     }
+
+    // Reapply admin class after re-render
+    grid.className = 'gallery-grid' + (isAdmin ? ' is-admin' : '');
     grid.innerHTML = '';
+
     for (const p of photos) {
       const card = document.createElement('div');
       card.className = 'photo-card';
       const date = new Date(p.timestamp).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
       card.innerHTML = `
+        <button class="delete-btn" data-id="${esc(p.id)}" title="Delete photo">✕</button>
         <img src="${esc(p.url)}" alt="${p.caption ? esc(p.caption) : 'Wedding photo'}" loading="lazy">
         <div class="photo-card-body">
           ${p.caption ? `<div class="photo-caption">${esc(p.caption)}</div>` : ''}
@@ -516,12 +621,39 @@ function loadGallery() {
         </div>`;
       grid.appendChild(card);
     }
+
+    // Attach delete listeners
+    grid.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        pendingDeleteId = btn.dataset.id;
+        document.getElementById('deleteOverlay').classList.add('visible');
+      });
+    });
   }, err => {
     console.error(err);
     grid.innerHTML = '<div class="empty-gallery"><p>Unable to load photos — please refresh.</p></div>';
   });
 }
 
+// ── Delete confirm ────────────────────────────────────────────────────────
+document.getElementById('cancelDelete').addEventListener('click', () => {
+  pendingDeleteId = null;
+  document.getElementById('deleteOverlay').classList.remove('visible');
+});
+
+document.getElementById('confirmDelete').addEventListener('click', async () => {
+  if (!pendingDeleteId || !window._fbReady) return;
+  try {
+    await window._deleteDoc(window._doc(window._db, 'photos', pendingDeleteId));
+  } catch(err) {
+    console.error('Delete failed:', err);
+  }
+  pendingDeleteId = null;
+  document.getElementById('deleteOverlay').classList.remove('visible');
+});
+
+// ── Utils ─────────────────────────────────────────────────────────────────
 function showStatus(msg, type) {
   const el = document.getElementById('uploadStatus');
   el.textContent = msg; el.className = 'status-msg ' + type;
