@@ -90,7 +90,8 @@
   .hero-amp { font-family: 'Great Vibes', cursive; color: var(--gold); font-size: 2rem; margin: 0 0.4rem; }
   .hero-date { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-light); margin-top: 0.6rem; }
 
-  .nav-tabs { display: flex; justify-content: center; background: var(--cream-dark); border-bottom: 1px solid var(--border); }
+  .nav-tabs { display: flex; justify-content: center; background: var(--cream-dark); border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
   .nav-tab { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-light); background: none; border: none; padding: 1rem 2.2rem; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
   .nav-tab:hover { color: var(--text-dark); }
   .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
@@ -297,6 +298,8 @@
   <nav class="nav-tabs">
     <button class="nav-tab active" id="tabBtnGallery">Wedding Album</button>
     <button class="nav-tab" id="tabBtnUpload">Share a Photo</button>
+    <button class="nav-tab" id="tabBtnMap">Map</button>
+    <button class="nav-tab" id="tabBtnBlooming">Blooming Instructions</button>
   </nav>
 
   <div class="content">
@@ -355,7 +358,92 @@
           <button class="upload-submit" id="submitBtn" disabled>Share Photo</button>
         </div>
         <div class="status-msg" id="uploadStatus"></div>
+    <!-- Map -->
+    <div id="tabMap" style="display:none;">
+      <div class="upload-section">
+        <div class="section-title">Find Us</div>
+        <div class="section-sub">Bassmead Manor Barns, Staploe, St. Neots PE19 5JB</div>
+        <div style="border-radius:4px;overflow:hidden;border:1px solid var(--border);margin-top:0.5rem;">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-0.3480%2C52.2290%2C-0.3143%2C52.2447&layer=mapnik&marker=52.2368%2C-0.3311"
+            width="100%" height="480" style="border:0;display:block;" allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+        <div style="margin-top:1.2rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Bassmead+Manor+Barns,Staploe,St+Neots+PE19+5JB&destination_place_id=ChIJ53xcjtjFd0gRkHBhXxGTRsU"
+             target="_blank"
+             style="display:inline-block;padding:0.7rem 1.4rem;background:var(--green-dark);color:var(--cream);border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.9rem;letter-spacing:0.1em;text-decoration:none;">
+            Get Directions (Google Maps) →
+          </a>
+          <a href="https://maps.apple.com/?q=Bassmead+Manor+Barns+PE19+5JB"
+             target="_blank"
+             style="display:inline-block;padding:0.7rem 1.4rem;background:var(--cream-dark);color:var(--text-dark);border:1px solid var(--border);border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.9rem;letter-spacing:0.1em;text-decoration:none;">
+            Open in Apple Maps
+          </a>
+        </div>
       </div>
+    </div>
+
+    <!-- Blooming Instructions -->
+    <div id="tabBlooming" style="display:none;">
+      <div class="upload-section">
+        <div class="section-title">How to Bloom Your Invitation 🌸</div>
+        <div class="section-sub">Your invitation is printed on seeded paper — plant it and watch wildflowers grow!</div>
+
+        <div style="display:grid;gap:1.2rem;margin-top:1rem;">
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">1️⃣</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Tear or cut into pieces</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Break your seeded paper into small pieces roughly 2–3cm in size. Smaller pieces help the seeds germinate more easily.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">2️⃣</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Choose your pot or patch</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Use a small pot with compost or a sunny spot in the garden. Make sure the soil is loose, moist and well-drained.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">3️⃣</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Place the paper on the soil</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Lay the pieces flat on top of the soil and gently press them down so they're in good contact with the compost.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">4️⃣</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Cover lightly with soil</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Sprinkle a thin layer of compost (about 3mm) over the top of the paper pieces to help them bed in.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">5️⃣</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Water gently & keep moist</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Water lightly using a fine spray or misting bottle. Keep the soil moist but not waterlogged. Place in a warm, bright spot — a sunny windowsill is perfect.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
+            <div style="font-size:1.8rem;flex-shrink:0;">🌱</div>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Watch them grow!</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Seedlings should start to appear within 1–2 weeks. Once established, move outdoors and enjoy your blooms — a little reminder of our special day. 🌸</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:1.5rem;padding:1rem 1.2rem;background:#f0f7ee;border:1px solid var(--green-light);border-radius:4px;font-size:0.85rem;color:var(--green-dark);line-height:1.6;">
+          💡 <strong>Best time to plant:</strong> Spring and autumn are ideal. Avoid planting during frost or in very hot, dry conditions. The wildflowers love British weather!
     </div>
 
   </div>
@@ -476,15 +564,21 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 });
 
 // ── Tabs ──────────────────────────────────────────────────────────────────
-document.getElementById('tabBtnGallery').addEventListener('click', () => showTab('gallery'));
-document.getElementById('tabBtnUpload').addEventListener('click',  () => showTab('upload'));
-document.getElementById('ctaShareBtn').addEventListener('click',   () => showTab('upload'));
+document.getElementById('tabBtnGallery').addEventListener('click',  () => showTab('gallery'));
+document.getElementById('tabBtnUpload').addEventListener('click',   () => showTab('upload'));
+document.getElementById('tabBtnMap').addEventListener('click',      () => showTab('map'));
+document.getElementById('tabBtnBlooming').addEventListener('click', () => showTab('blooming'));
+document.getElementById('ctaShareBtn').addEventListener('click',    () => showTab('upload'));
 
 function showTab(tab) {
-  document.getElementById('tabGallery').style.display = tab === 'gallery' ? 'block' : 'none';
-  document.getElementById('tabUpload').style.display  = tab === 'upload'  ? 'block' : 'none';
-  document.getElementById('tabBtnGallery').classList.toggle('active', tab === 'gallery');
-  document.getElementById('tabBtnUpload').classList.toggle('active',  tab === 'upload');
+  document.getElementById('tabGallery').style.display  = tab === 'gallery'   ? 'block' : 'none';
+  document.getElementById('tabUpload').style.display   = tab === 'upload'    ? 'block' : 'none';
+  document.getElementById('tabMap').style.display      = tab === 'map'       ? 'block' : 'none';
+  document.getElementById('tabBlooming').style.display = tab === 'blooming'  ? 'block' : 'none';
+  document.getElementById('tabBtnGallery').classList.toggle('active',  tab === 'gallery');
+  document.getElementById('tabBtnUpload').classList.toggle('active',   tab === 'upload');
+  document.getElementById('tabBtnMap').classList.toggle('active',      tab === 'map');
+  document.getElementById('tabBtnBlooming').classList.toggle('active', tab === 'blooming');
   if (tab === 'gallery') loadGallery();
 }
 
