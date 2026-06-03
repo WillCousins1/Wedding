@@ -300,6 +300,7 @@
     <button class="nav-tab" id="tabBtnUpload">Share a Photo</button>
     <button class="nav-tab" id="tabBtnMap">Map</button>
     <button class="nav-tab" id="tabBtnBlooming">Blooming Instructions</button>
+    <button class="nav-tab" id="tabBtnStays">Overnight Stays</button>
   </nav>
 
   <div class="content">
@@ -323,8 +324,12 @@
         <button class="cta-btn" id="ctaShareBtn">+ Share a Photo</button>
       </div>
       <div class="gallery-header">
-        <div class="album-page-title">Wedding Album</div>
+        <div class="album-page-title" id="galleryTitle">Wedding Album</div>
         <div class="photo-count" id="photoCount"></div>
+      </div>
+      <div style="display:flex;gap:0.6rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <button id="filterAll" onclick="setFilter('all')" style="padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--gold);background:var(--gold);color:white;font-family:'Cormorant Garamond',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;">All Photos</button>
+        <button id="filterBlooming" onclick="setFilter('blooming')" style="padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:'Cormorant Garamond',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;">🌸 Blooming Album</button>
       </div>
       <div id="galleryGrid" class="gallery-grid">
         <div class="loading-msg">Loading photos…</div>
@@ -357,6 +362,10 @@
           <input class="caption-input" type="text" id="captionInput" placeholder="Add a caption (optional)…" maxlength="140">
           <button class="upload-submit" id="submitBtn" disabled>Share Photo</button>
         </div>
+        <label style="display:flex;align-items:center;gap:0.6rem;margin-top:0.9rem;cursor:pointer;font-size:0.9rem;color:var(--text-mid);">
+          <input type="checkbox" id="isWildflower" style="width:16px;height:16px;accent-color:var(--green-dark);cursor:pointer;">
+          🌸 This is a wildflower / blooming photo — add it to the Blooming Album
+        </label>
         <div class="status-msg" id="uploadStatus"></div>
       </div>
     </div><!-- end tabUpload -->
@@ -457,67 +466,123 @@
     <!-- Blooming Instructions -->
     <div id="tabBlooming" style="display:none;">
       <div class="upload-section">
-        <div class="section-title">How to Bloom Your Invitation 🌸</div>
-        <div class="section-sub">Your invitation is printed on seeded paper — plant it and watch wildflowers grow!</div>
+        <div class="section-title">How to Grow Your Invitation 🌸</div>
+        <div class="section-sub">Your invitation is printed on plantable seed paper — follow these 4 easy steps to grow beautiful British wildflowers!</div>
 
         <div style="display:grid;gap:1.2rem;margin-top:1rem;">
 
           <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
             <div style="font-size:1.8rem;flex-shrink:0;">1️⃣</div>
             <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Tear or cut into pieces</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Break your seeded paper into small pieces roughly 2–3cm in size. Smaller pieces help the seeds germinate more easily.</div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Plant it</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.7;">Fill your pot with two-thirds of quality potting soil, and give it a good pat down. Then, tear the page into sections or pop the whole piece directly into soil. Press it in gently, then cover with 1–2cm more soil.</div>
             </div>
           </div>
 
           <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
             <div style="font-size:1.8rem;flex-shrink:0;">2️⃣</div>
             <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Choose your pot or patch</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Use a small pot with compost or a sunny spot in the garden. Make sure the soil is loose, moist and well-drained.</div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Make it rain</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.7;">Growing is thirsty business. Make sure you give it lots to drink and water the pot regularly, keeping the soil consistently moist but not waterlogged.</div>
             </div>
           </div>
 
           <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
             <div style="font-size:1.8rem;flex-shrink:0;">3️⃣</div>
             <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Place the paper on the soil</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Lay the pieces flat on top of the soil and gently press them down so they're in good contact with the compost.</div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Everybody loves the sunshine</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.7;">Keep your seed paper planted in as sunny a spot as possible, whether that be on a windowsill, outside or in a greenhouse — as long as it's warm. Oh and don't forget to keep watering it.</div>
             </div>
           </div>
 
           <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
             <div style="font-size:1.8rem;flex-shrink:0;">4️⃣</div>
             <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Cover lightly with soil</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Sprinkle a thin layer of compost (about 3mm) over the top of the paper pieces to help them bed in.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
-            <div style="font-size:1.8rem;flex-shrink:0;">5️⃣</div>
-            <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Water gently & keep moist</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Water lightly using a fine spray or misting bottle. Keep the soil moist but not waterlogged. Place in a warm, bright spot — a sunny windowsill is perfect.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:1.2rem;align-items:flex-start;padding:1.2rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;">
-            <div style="font-size:1.8rem;flex-shrink:0;">🌱</div>
-            <div>
-              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Watch them grow!</div>
-              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.6;">Seedlings should start to appear within 1–2 weeks. Once established, move outdoors and enjoy your blooms — a little reminder of our special day. 🌸</div>
+              <div style="font-size:1.1rem;color:var(--text-dark);margin-bottom:0.3rem;">Bloom</div>
+              <div style="font-size:0.88rem;color:var(--text-light);line-height:1.7;">After 2–3 weeks your seeds should germinate and you'll start to see your beautiful plants flourish. Once they begin to sprout, continue to provide some TLC by watering as needed and ensuring they receive sufficient light.</div>
             </div>
           </div>
 
         </div>
 
         <div style="margin-top:1.5rem;padding:1rem 1.2rem;background:#f0f7ee;border:1px solid var(--green-light);border-radius:4px;font-size:0.85rem;color:var(--green-dark);line-height:1.6;">
-          💡 <strong>Best time to plant:</strong> Spring and autumn are ideal. Avoid planting during frost or in very hot, dry conditions. The wildflowers love British weather!
+          💡 <strong>Please note:</strong> The paper is truly natural, which means we can't guarantee every seed will sprout — but with the right care and attention, the results should be lovely. Once your wildflowers bloom, share a photo in the <strong>Blooming Album</strong> above! 🌸
         </div>
 
       </div>
     </div><!-- end tabBlooming -->
+
+    <!-- Overnight Stays -->
+    <div id="tabStays" style="display:none;">
+      <div class="upload-section">
+        <div class="section-title">Overnight Stays 🌙</div>
+        <div class="section-sub">Don't want to travel home after the evening? Here are some great nearby places to stay — all within easy reach of Bassmead Manor Barns.</div>
+
+        <div style="display:grid;gap:1.2rem;margin-top:1.2rem;">
+
+          <!-- Premier Inn Colmworth Park -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:1.4rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div style="font-size:1.15rem;color:var(--text-dark);font-weight:400;">Premier Inn St. Neots (Colmworth Park)</div>
+              <div style="background:var(--green-dark);color:white;padding:0.25rem 0.75rem;border-radius:2rem;font-size:0.8rem;white-space:nowrap;">From ~£60/night</div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-light);">📍 Colmworth Business Park, Eaton Socon, PE19 8YP · <strong>~5 miles from venue</strong></div>
+            <div style="font-size:0.88rem;color:var(--text-mid);line-height:1.6;">A reliable and comfortable option just off the A1. Free parking, free WiFi, en-suite rooms and an on-site Brewers Fayre restaurant for breakfast. Great value and easy to book. ⭐ 4.1/5</div>
+            <a href="https://www.premierinn.com/gb/en/hotels/england/cambridgeshire/st-neots/st-neots-colmworth-park.html" target="_blank" style="align-self:flex-start;padding:0.45rem 1rem;background:var(--gold);color:white;border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;letter-spacing:0.08em;text-decoration:none;margin-top:0.3rem;">Book Now →</a>
+          </div>
+
+          <!-- Eaton Oak -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:1.4rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div style="font-size:1.15rem;color:var(--text-dark);font-weight:400;">Eaton Oak</div>
+              <div style="background:var(--green-dark);color:white;padding:0.25rem 0.75rem;border-radius:2rem;font-size:0.8rem;white-space:nowrap;">From ~£75/night</div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-light);">📍 Crosshall Road, Eaton Ford, St. Neots PE19 7DB · <strong>~5 miles from venue</strong></div>
+            <div style="font-size:0.88rem;color:var(--text-mid);line-height:1.6;">A popular pub with rooms — great for a relaxed overnight stay. Clean, comfortable rooms, dog-friendly, and a well-regarded restaurant for a hearty breakfast. ⭐ 4.2/5</div>
+            <a href="https://www.greeneking-inns.co.uk/hotels/east-of-england/eaton-oak/" target="_blank" style="align-self:flex-start;padding:0.45rem 1rem;background:var(--gold);color:white;border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;letter-spacing:0.08em;text-decoration:none;margin-top:0.3rem;">Book Now →</a>
+          </div>
+
+          <!-- The Lion Hotel Buckden -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:1.4rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div style="font-size:1.15rem;color:var(--text-dark);font-weight:400;">The Lion Hotel, Buckden</div>
+              <div style="background:var(--green-dark);color:white;padding:0.25rem 0.75rem;border-radius:2rem;font-size:0.8rem;white-space:nowrap;">From ~£80/night</div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-light);">📍 44–46 High Street, Buckden, St. Neots PE19 5XA · <strong>~5 miles from venue</strong></div>
+            <div style="font-size:0.88rem;color:var(--text-mid);line-height:1.6;">A charming characterful inn with a warm welcome. Comfy beds, good food and a real pub atmosphere — a lovely spot to wind down after an evening of celebrating. Dog-friendly. ⭐ 4.1/5</div>
+            <a href="https://www.thelionhotelbuckden.com" target="_blank" style="align-self:flex-start;padding:0.45rem 1rem;background:var(--gold);color:white;border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;letter-spacing:0.08em;text-decoration:none;margin-top:0.3rem;">Book Now →</a>
+          </div>
+
+          <!-- Highfield Farm B&B -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:1.4rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div style="font-size:1.15rem;color:var(--text-dark);font-weight:400;">Highfield Farm B&B</div>
+              <div style="background:var(--green-dark);color:white;padding:0.25rem 0.75rem;border-radius:2rem;font-size:0.8rem;white-space:nowrap;">From ~£85/night</div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-light);">📍 Tempsford Road, Sandy SG19 2AQ · <strong>~7 miles from venue</strong></div>
+            <div style="font-size:0.88rem;color:var(--text-mid);line-height:1.6;">A beautiful countryside B&B with exceptional reviews. Set in the heart of the Bedfordshire countryside, with a wonderful breakfast and a warm, welcoming host. Perfect for those wanting a peaceful rural setting. ⭐ 4.8/5</div>
+            <a href="https://www.highfieldfarmtourpark.co.uk" target="_blank" style="align-self:flex-start;padding:0.45rem 1rem;background:var(--gold);color:white;border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;letter-spacing:0.08em;text-decoration:none;margin-top:0.3rem;">Book Now →</a>
+          </div>
+
+          <!-- Drift Inn Wyboston Lakes -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:1.4rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div style="font-size:1.15rem;color:var(--text-dark);font-weight:400;">Drift Inn at Wyboston Lakes</div>
+              <div style="background:var(--green-dark);color:white;padding:0.25rem 0.75rem;border-radius:2rem;font-size:0.8rem;white-space:nowrap;">From ~£70/night</div>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-light);">📍 Great North Road, Wyboston, Bedfordshire MK44 3AL · <strong>~6 miles from venue</strong></div>
+            <div style="font-size:0.88rem;color:var(--text-mid);line-height:1.6;">Set within the Wyboston Lakes resort, with golf, spa and lake views on the doorstep. A great option for those wanting something a bit more of a treat. On-site bar and restaurant. ⭐ 4.3/5</div>
+            <a href="https://www.wybostonlakes.co.uk/accommodation" target="_blank" style="align-self:flex-start;padding:0.45rem 1rem;background:var(--gold);color:white;border-radius:2px;font-family:'Cormorant Garamond',serif;font-size:0.85rem;letter-spacing:0.08em;text-decoration:none;margin-top:0.3rem;">Book Now →</a>
+          </div>
+
+        </div>
+
+        <div style="margin-top:1.5rem;padding:1rem 1.2rem;background:#f0f7ee;border:1px solid var(--green-light);border-radius:4px;font-size:0.85rem;color:var(--green-dark);line-height:1.6;">
+          💡 <strong>Tip:</strong> Prices shown are approximate and will vary by date. We recommend booking early as rooms near the venue can fill up quickly for a Sunday night in June! 🌿
+        </div>
+
+      </div>
+    </div><!-- end tabStays -->
 
   </div><!-- end content -->
 </div><!-- end appPage -->
@@ -541,6 +606,7 @@ let isAdmin      = false;
 let selectedFile = null;
 let unsubscribe  = null;
 let pendingDeleteId = null;
+let currentFilter = 'all'; // 'all' or 'blooming'
 
 // ── Firebase ready ────────────────────────────────────────────────────────
 document.addEventListener('firebase-ready', () => {
@@ -641,6 +707,7 @@ document.getElementById('tabBtnGallery').addEventListener('click',  () => showTa
 document.getElementById('tabBtnUpload').addEventListener('click',   () => showTab('upload'));
 document.getElementById('tabBtnMap').addEventListener('click',      () => showTab('map'));
 document.getElementById('tabBtnBlooming').addEventListener('click', () => showTab('blooming'));
+document.getElementById('tabBtnStays').addEventListener('click',    () => showTab('stays'));
 document.getElementById('ctaShareBtn').addEventListener('click',    () => showTab('upload'));
 
 function showTab(tab) {
@@ -648,10 +715,12 @@ function showTab(tab) {
   document.getElementById('tabUpload').style.display   = tab === 'upload'    ? 'block' : 'none';
   document.getElementById('tabMap').style.display      = tab === 'map'       ? 'block' : 'none';
   document.getElementById('tabBlooming').style.display = tab === 'blooming'  ? 'block' : 'none';
+  document.getElementById('tabStays').style.display    = tab === 'stays'     ? 'block' : 'none';
   document.getElementById('tabBtnGallery').classList.toggle('active',  tab === 'gallery');
   document.getElementById('tabBtnUpload').classList.toggle('active',   tab === 'upload');
   document.getElementById('tabBtnMap').classList.toggle('active',      tab === 'map');
   document.getElementById('tabBtnBlooming').classList.toggle('active', tab === 'blooming');
+  document.getElementById('tabBtnStays').classList.toggle('active',    tab === 'stays');
   if (tab === 'gallery') loadGallery();
 }
 
@@ -694,6 +763,7 @@ function resetForm() {
   document.getElementById('uploadPreview').style.display  = 'none';
   document.getElementById('captionInput').value           = '';
   document.getElementById('submitBtn').disabled           = true;
+  document.getElementById('isWildflower').checked         = false;
   document.getElementById('uploadStatus').className       = 'status-msg';
   document.getElementById('progressWrap').style.display   = 'none';
   document.getElementById('progressBar').style.width      = '0%';
@@ -719,10 +789,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     animateProgress(60, 90, 400);
 
     await window._addDoc(window._collection(window._db, 'photos'), {
-      guest:     currentGuest,
-      caption:   document.getElementById('captionInput').value.trim(),
-      url:       data.secure_url,
-      timestamp: Date.now()
+      guest:      currentGuest,
+      caption:    document.getElementById('captionInput').value.trim(),
+      url:        data.secure_url,
+      wildflower: document.getElementById('isWildflower').checked,
+      timestamp:  Date.now()
     });
     animateProgress(90, 100, 200);
 
@@ -749,6 +820,28 @@ function animateProgress(from, to, duration) {
   requestAnimationFrame(step);
 }
 
+// ── Filter ────────────────────────────────────────────────────────────────
+function setFilter(filter) {
+  currentFilter = filter;
+  const allBtn      = document.getElementById('filterAll');
+  const bloomBtn    = document.getElementById('filterBlooming');
+  const title       = document.getElementById('galleryTitle');
+  const activeStyle = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--gold);background:var(--gold);color:white;font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
+  const inactiveStyle = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
+  if (filter === 'all') {
+    allBtn.style.cssText   = activeStyle;
+    bloomBtn.style.cssText = inactiveStyle;
+    title.textContent      = 'Wedding Album';
+  } else {
+    allBtn.style.cssText   = inactiveStyle;
+    bloomBtn.style.cssText = activeStyle.replace('var(--gold)', '#6b8f62').replace('var(--gold)', '#6b8f62');
+    bloomBtn.style.background = '#6b8f62';
+    bloomBtn.style.borderColor = '#6b8f62';
+    title.textContent      = '🌸 Blooming Album';
+  }
+  loadGallery();
+}
+
 // ── Gallery ───────────────────────────────────────────────────────────────
 function loadGallery() {
   if (!window._fbReady) return;
@@ -762,12 +855,21 @@ function loadGallery() {
   );
 
   unsubscribe = window._onSnapshot(q, snapshot => {
-    const photos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    let photos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Apply album filter
+    if (currentFilter === 'blooming') {
+      photos = photos.filter(p => p.wildflower === true);
+    }
+
     document.getElementById('photoCount').textContent =
       photos.length ? photos.length + ' photo' + (photos.length !== 1 ? 's' : '') : '';
 
     if (!photos.length) {
-      grid.innerHTML = '<div class="empty-gallery"><div class="empty-icon">🌿</div><p>No photos yet — be the first to share one!</p></div>';
+      const emptyMsg = currentFilter === 'blooming'
+        ? 'No blooming photos yet — tick the 🌸 box when sharing a wildflower photo!'
+        : 'No photos yet — be the first to share one!';
+      grid.innerHTML = `<div class="empty-gallery"><div class="empty-icon">${currentFilter === 'blooming' ? '🌸' : '🌿'}</div><p>${emptyMsg}</p></div>`;
       return;
     }
 
@@ -781,6 +883,7 @@ function loadGallery() {
       const date = new Date(p.timestamp).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
       card.innerHTML = `
         <button class="delete-btn" data-id="${esc(p.id)}" title="Delete photo">✕</button>
+        ${p.wildflower ? '<div style="position:absolute;top:0.5rem;left:0.5rem;background:rgba(255,255,255,0.9);border-radius:2rem;padding:0.15rem 0.55rem;font-size:0.72rem;color:var(--green-dark);border:1px solid var(--green-light);">🌸 Blooming</div>' : ''}
         <img src="${esc(p.url)}" alt="${p.caption ? esc(p.caption) : 'Wedding photo'}" loading="lazy">
         <div class="photo-card-body">
           ${p.caption ? `<div class="photo-caption">${esc(p.caption)}</div>` : ''}
