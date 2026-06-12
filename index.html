@@ -341,11 +341,12 @@
         <button class="cta-btn" id="ctaShareBtn">+ Share a Photo</button>
       </div>
       <div class="gallery-header">
-        <div class="album-page-title" id="galleryTitle">Wedding Album</div>
+        <div class="album-page-title" id="galleryTitle">All Photos</div>
         <div class="photo-count" id="photoCount"></div>
       </div>
       <div style="display:flex;gap:0.6rem;margin-bottom:1.5rem;flex-wrap:wrap;">
         <button id="filterAll" onclick="setFilter('all')" style="padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--gold);background:var(--gold);color:white;font-family:'Cormorant Garamond',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;">All Photos</button>
+        <button id="filterWedding" onclick="setFilter('wedding')" style="padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:'Cormorant Garamond',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;">💍 Wedding Album</button>
         <button id="filterBlooming" onclick="setFilter('blooming')" style="padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:'Cormorant Garamond',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;">🌸 Blooming Album</button>
       </div>
       <div id="galleryGrid" class="gallery-grid">
@@ -484,7 +485,7 @@
     <div id="tabBlooming" style="display:none;">
       <div class="upload-section">
         <div class="section-title">How to Grow Your Save The Date 🌸</div>
-        <div class="section-sub">Your invitation is printed on plantable seed paper — follow these 4 easy steps to grow beautiful British wildflowers!</div>
+        <div class="section-sub">Your save the date is printed on plantable seed paper — follow these 4 easy steps to grow beautiful British wildflowers!</div>
 
         <div style="display:grid;gap:1.2rem;margin-top:1rem;">
 
@@ -623,7 +624,7 @@ let isAdmin      = false;
 let selectedFile = null;
 let unsubscribe  = null;
 let pendingDeleteId = null;
-let currentFilter = 'all'; // 'all' or 'blooming'
+let currentFilter = 'all'; // 'all', 'wedding' or 'blooming'
 
 // ── Firebase ready ────────────────────────────────────────────────────────
 document.addEventListener('firebase-ready', () => {
@@ -841,21 +842,21 @@ function animateProgress(from, to, duration) {
 function setFilter(filter) {
   currentFilter = filter;
   const allBtn      = document.getElementById('filterAll');
+  const weddingBtn  = document.getElementById('filterWedding');
   const bloomBtn    = document.getElementById('filterBlooming');
   const title       = document.getElementById('galleryTitle');
-  const activeStyle = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--gold);background:var(--gold);color:white;font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
-  const inactiveStyle = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
-  if (filter === 'all') {
-    allBtn.style.cssText   = activeStyle;
-    bloomBtn.style.cssText = inactiveStyle;
-    title.textContent      = 'Wedding Album';
-  } else {
-    allBtn.style.cssText   = inactiveStyle;
-    bloomBtn.style.cssText = activeStyle.replace('var(--gold)', '#6b8f62').replace('var(--gold)', '#6b8f62');
-    bloomBtn.style.background = '#6b8f62';
-    bloomBtn.style.borderColor = '#6b8f62';
-    title.textContent      = '🌸 Blooming Album';
-  }
+  const activeGold  = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--gold);background:var(--gold);color:white;font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
+  const activeGreen = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid #6b8f62;background:#6b8f62;color:white;font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
+  const inactive    = 'padding:0.45rem 1.1rem;border-radius:2rem;border:1px solid var(--border);background:white;color:var(--text-mid);font-family:\'Cormorant Garamond\',serif;font-size:0.82rem;letter-spacing:0.08em;cursor:pointer;';
+
+  allBtn.style.cssText     = filter === 'all'      ? activeGold  : inactive;
+  weddingBtn.style.cssText = filter === 'wedding'  ? activeGold  : inactive;
+  bloomBtn.style.cssText   = filter === 'blooming' ? activeGreen : inactive;
+
+  if (filter === 'all')      title.textContent = 'All Photos';
+  if (filter === 'wedding')  title.textContent = '💍 Wedding Album';
+  if (filter === 'blooming') title.textContent = '🌸 Blooming Album';
+
   loadGallery();
 }
 
@@ -877,6 +878,8 @@ function loadGallery() {
     // Apply album filter
     if (currentFilter === 'blooming') {
       photos = photos.filter(p => p.wildflower === true);
+    } else if (currentFilter === 'wedding') {
+      photos = photos.filter(p => !p.wildflower);
     }
 
     document.getElementById('photoCount').textContent =
@@ -885,8 +888,11 @@ function loadGallery() {
     if (!photos.length) {
       const emptyMsg = currentFilter === 'blooming'
         ? 'No blooming photos yet — tick the 🌸 box when sharing a wildflower photo!'
+        : currentFilter === 'wedding'
+        ? 'No wedding photos yet — be the first to share one!'
         : 'No photos yet — be the first to share one!';
-      grid.innerHTML = `<div class="empty-gallery"><div class="empty-icon">${currentFilter === 'blooming' ? '🌸' : '🌿'}</div><p>${emptyMsg}</p></div>`;
+      const emptyIcon = currentFilter === 'blooming' ? '🌸' : currentFilter === 'wedding' ? '💍' : '🌿';
+      grid.innerHTML = `<div class="empty-gallery"><div class="empty-icon">${emptyIcon}</div><p>${emptyMsg}</p></div>`;
       return;
     }
 
