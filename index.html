@@ -267,10 +267,12 @@
     <div class="couple-names">William Christopher Cousins</div>
     <div class="divider"></div>
     <div class="date-venue">Sunday 20th June 2027 · Bassmead Manor Barns, Staploe, PE19 5JB</div>
-    <label class="login-label" for="guestName">Your Name</label>
-    <input class="login-input" type="text" id="guestName" placeholder="e.g. Emma Johnson" autocomplete="name">
+    <label class="login-label" for="guestFirstName">First Name</label>
+    <input class="login-input" type="text" id="guestFirstName" placeholder="e.g. Emma" autocomplete="given-name">
+    <label class="login-label" for="guestSurname">Surname</label>
+    <input class="login-input" type="text" id="guestSurname" placeholder="e.g. Johnson" autocomplete="family-name">
     <label class="login-label" for="guestPass">Password</label>
-    <input class="login-input" type="password" id="guestPass" placeholder="Enter the password" autocomplete="current-password">
+    <input class="login-input" type="password" id="guestPass" placeholder="Enter your password" autocomplete="current-password">
     <button class="login-btn" id="loginBtn">Enter the Celebration</button>
     <div class="login-error" id="loginError"></div>
   </div>
@@ -639,34 +641,38 @@ document.addEventListener('firebase-ready', () => {
 
 // ── Login ─────────────────────────────────────────────────────────────────
 document.getElementById('loginBtn').addEventListener('click', handleLogin);
-['guestName','guestPass'].forEach(id =>
+['guestFirstName','guestSurname','guestPass'].forEach(id =>
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); })
 );
 
 function handleLogin() {
-  const name = document.getElementById('guestName').value.trim();
-  const pass = document.getElementById('guestPass').value.trim();
-  const err  = document.getElementById('loginError');
+  const firstName = document.getElementById('guestFirstName').value.trim();
+  const surname   = document.getElementById('guestSurname').value.trim();
+  const pass      = document.getElementById('guestPass').value.trim();
+  const err       = document.getElementById('loginError');
 
-  if (!name) { err.textContent = 'Please enter your name.'; err.style.display = 'block'; return; }
+  if (!firstName) { err.textContent = 'Please enter your first name.'; err.style.display = 'block'; return; }
+  if (!surname)   { err.textContent = 'Please enter your surname.'; err.style.display = 'block'; return; }
+
+  const fullName = firstName + ' ' + surname;
 
   // Check admin password first
   if (pass === ADMIN_PASSWORD) {
     err.style.display = 'none';
-    currentGuest = name;
+    currentGuest = fullName;
     isAdmin      = true;
-    sessionStorage.setItem('sw_guest', name);
+    sessionStorage.setItem('sw_guest', fullName);
     sessionStorage.setItem('sw_admin', 'true');
     showApp();
     return;
   }
 
-  // Check guest password
+  // Check shared guest password
   if (pass === GUEST_PASSWORD) {
     err.style.display = 'none';
-    currentGuest = name;
+    currentGuest = fullName;
     isAdmin      = false;
-    sessionStorage.setItem('sw_guest', name);
+    sessionStorage.setItem('sw_guest', fullName);
     sessionStorage.setItem('sw_admin', 'false');
     showApp();
     return;
@@ -717,7 +723,8 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   document.getElementById('appPage').style.display   = 'none';
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('guestPass').value = '';
-  document.getElementById('guestName').value = '';
+  document.getElementById('guestFirstName').value = '';
+  document.getElementById('guestSurname').value = '';
 });
 
 // ── Tabs ──────────────────────────────────────────────────────────────────
