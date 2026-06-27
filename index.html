@@ -271,8 +271,6 @@
     <input class="login-input" type="text" id="guestFirstName" placeholder="e.g. Emma" autocomplete="given-name">
     <label class="login-label" for="guestSurname">Surname</label>
     <input class="login-input" type="text" id="guestSurname" placeholder="e.g. Johnson" autocomplete="family-name">
-    <label class="login-label" for="guestPass">Password</label>
-    <input class="login-input" type="password" id="guestPass" placeholder="Enter your password" autocomplete="current-password">
     <button class="login-btn" id="loginBtn">Enter the Celebration</button>
     <div class="login-error" id="loginError"></div>
   </div>
@@ -612,6 +610,15 @@
 const GUEST_PASSWORD = 'bassmead2027';
 const ADMIN_PASSWORD = 'Sophie&William2027';
 
+// Approved guest surnames (case-insensitive)
+const APPROVED_SURNAMES = [
+  'newstead', 'cousins', 'everitt', 'cowie', 'jackson', 'flatt',
+  'newsmith', 'woolard', 'rowland', 'harris', 'boodhoo', 'whitmore',
+  'stace', 'cropley', 'beeton', 'holliday', 'butcher', 'hayward',
+  'beckwith', 'mcgonigal', 'smith', 'hallett-morley', 'crofts',
+  'wilkin', 'kendall', 'canham', 'reynolds', 'baker', 'jones'
+];
+
 const CLOUDINARY_CLOUD_NAME    = 'dtkfauneu';
 const CLOUDINARY_UPLOAD_PRESET = 'Wedding';
 
@@ -641,14 +648,13 @@ document.addEventListener('firebase-ready', () => {
 
 // ── Login ─────────────────────────────────────────────────────────────────
 document.getElementById('loginBtn').addEventListener('click', handleLogin);
-['guestFirstName','guestSurname','guestPass'].forEach(id =>
+['guestFirstName','guestSurname'].forEach(id =>
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); })
 );
 
 function handleLogin() {
   const firstName = document.getElementById('guestFirstName').value.trim();
   const surname   = document.getElementById('guestSurname').value.trim();
-  const pass      = document.getElementById('guestPass').value.trim();
   const err       = document.getElementById('loginError');
 
   if (!firstName) { err.textContent = 'Please enter your first name.'; err.style.display = 'block'; return; }
@@ -656,19 +662,19 @@ function handleLogin() {
 
   const fullName = firstName + ' ' + surname;
 
-  // Check admin password first
-  if (pass === ADMIN_PASSWORD) {
+  // Admin login — first name field used as password trigger
+  if (firstName === ADMIN_PASSWORD) {
     err.style.display = 'none';
-    currentGuest = fullName;
+    currentGuest = surname;
     isAdmin      = true;
-    sessionStorage.setItem('sw_guest', fullName);
+    sessionStorage.setItem('sw_guest', surname);
     sessionStorage.setItem('sw_admin', 'true');
     showApp();
     return;
   }
 
-  // Check shared guest password
-  if (pass === GUEST_PASSWORD) {
+  // Check if surname is in approved list
+  if (APPROVED_SURNAMES.includes(surname.toLowerCase())) {
     err.style.display = 'none';
     currentGuest = fullName;
     isAdmin      = false;
@@ -678,7 +684,7 @@ function handleLogin() {
     return;
   }
 
-  err.textContent = 'Incorrect password — please try again.';
+  err.textContent = 'Sorry, we don\'t recognise that surname. Please check your spelling or speak to Sophie or William.';
   err.style.display = 'block';
 }
 
@@ -722,7 +728,6 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   resetForm();
   document.getElementById('appPage').style.display   = 'none';
   document.getElementById('loginPage').style.display = 'flex';
-  document.getElementById('guestPass').value = '';
   document.getElementById('guestFirstName').value = '';
   document.getElementById('guestSurname').value = '';
 });
